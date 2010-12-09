@@ -248,9 +248,22 @@ HTMLLIElement.prototype.openAllInTabs = function(firstInCurrentTab)
 	window.close();
 }
 
-HTMLLIElement.prototype.copyURL = function()
+HTMLLIElement.prototype.cut = function()
+{
+	chrome.experimental.bookmarkManager.cut([this.id.toString()]);
+	this.removeFromUI();
+	this.reDraw();
+}
+
+HTMLLIElement.prototype.copy = function()
 {
 	chrome.experimental.bookmarkManager.copy([this.id.toString()]);
+}
+
+HTMLLIElement.prototype.paste = function()
+{
+	chrome.experimental.bookmarkManager.paste(this.parentFolder.isRoot ? this.parentFolderId : this.parentFolder.id);
+	this.parentFolder.reDraw();
 }
 
 HTMLLIElement.prototype.openAllInNewWindow = function(incognito)
@@ -302,13 +315,9 @@ HTMLLIElement.prototype.showContextMenu = function(ev)
 	{
 		chrome.i18n.initAll(contextMenu);
 		contextMenu.querySelectorAll(config.useGoogleBookmarks ?
-			'li[action="reorder"], li[action="useGoogleBookmarks"]' :
+			'li[action="reorder"], li[action="useGoogleBookmarks"], li[action="cut"], li[action="copy"], li[action="paste"]' :
 			'li[action="addGBookmark"], li[action="reload"], li[action="useChromeBookmarks"]').
 				forEach(function() { this.hide(); });
-		if(config.useGoogleBookmarks)
-		{
-			contextMenu.querySelector('li[action="copyURL"]').hide();
-		}
 		if(isHideCMOpenIncognito())
 		{
 			contextMenu.
@@ -344,7 +353,11 @@ HTMLLIElement.prototype.showContextMenu = function(ev)
 		this.isBookmark || this.isFolder && this.isEmpty ? 'enabled' : 'disabled';
 	if(!config.useGoogleBookmarks)
 	{
-		contextMenu.querySelector('li[action="copyURL"]')[this.isFolder ? 'hide' : 'show']();
+		chrome.experimental.bookmarkManager.canPaste(
+			this.parentFolder.isRoot ? this.parentFolderId : this.parentFolder.id, function(canPaste)
+			{
+				contextMenu.querySelector('li[action="paste"]').className = canPaste ? 'enabled' : 'disabled';
+			});
 	}
 	contextMenu.show();
 
@@ -409,7 +422,12 @@ HTMLLIElement.prototype.remove = function()
 		document.querySelectorAll('li[gid="' + gid + '"]').
 			forEach(function() { this.removeFromUI(); });
 	}
-	// replace folder content after removing bookmark
+	this.reDraw();
+}
+
+HTMLLIElement.prototype.reDraw = function()
+{
+	// reposition folder content after removing bookmark
 	var parentFolder = this.parentFolder;
 	if(!parentFolder.isRoot && parentFolder.exists !== false)
 	{
