@@ -23,6 +23,9 @@
     "reorder": { "message": "Trier par nom" },
     "reloadGBookmarks": { "message": "Recharger les favoris de Google" },
     "addBookmark": { "message": "Marquer cette page" },
+    "cut": { "message": "Couper" },
+    "copy": { "message": "Copier" },
+    "paste": { "message": "Coller" },
     "remove": { "message": "Supprimer" },
 
     // Add Google bookmark dialog

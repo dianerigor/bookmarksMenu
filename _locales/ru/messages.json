@@ -20,6 +20,9 @@
     "reorder": { "message": "Упорядочить по заголовкам" },
     "reloadGBookmarks": { "message": "Перезагрузить закладки Google" },
     "addBookmark": { "message": "Добавить страницу в закладки" },
+    "cut": { "message": "Вырезать" },
+    "copy": { "message": "Копировать" },
+    "paste": { "message": "Вставить" },
     "remove": { "message": "Удалить" },
 
     // Add Google bookmark dialog
