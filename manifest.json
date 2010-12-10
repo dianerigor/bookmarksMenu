@@ -1,6 +1,6 @@
 {
 	"name": "Extended Bookmarks Menu",
-	"version": "3.4.0.4",
+	"version": "3.4.0.5",
 	"description": "__MSG_extDescription__",
 	"default_locale": "en",
 	"browser_action":

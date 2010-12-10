@@ -76,7 +76,7 @@ HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append, 
 			}
 			else
 			{
-				if(position != -1)
+				if(position != undefined)
 				{
 					this.insertBefore(bookmark, this.childNodes[position]);
 				}
