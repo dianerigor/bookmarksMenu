@@ -314,10 +314,14 @@ HTMLLIElement.prototype.showContextMenu = function(ev)
 	if(!contextMenu.initialized)
 	{
 		chrome.i18n.initAll(contextMenu);
-		contextMenu.querySelectorAll(config.useGoogleBookmarks ?
+		var useGoogleBookmarks = config.useGoogleBookmarks;
+		contextMenu.querySelectorAll(useGoogleBookmarks ?
 			'li[action="reorder"], li[action="useGoogleBookmarks"], li[action="cut"], li[action="copy"], li[action="paste"]' :
 			'li[action="addGBookmark"], li[action="reload"], li[action="useChromeBookmarks"]').
 				forEach(function() { this.hide(); });
+		var separators = contextMenu.querySelectorAll('li.separator');				
+		separators[1][useGoogleBookmarks ? 'hide' : 'show']();
+		separators[2][useGoogleBookmarks ? 'hide' : 'show']();
 		if(isHideCMOpenIncognito())
 		{
 			contextMenu.
@@ -326,10 +330,10 @@ HTMLLIElement.prototype.showContextMenu = function(ev)
 		}
 		if(isHideCMModeSwitcher())
 		{
-			if(!config.useGoogleBookmarks)
+			if(!useGoogleBookmarks)
 			{
 				contextMenu.querySelector('li[action="useGoogleBookmarks"]').hide();
-				contextMenu.querySelectorAll('li.separator')[1].hide();
+				separators[3].hide();
 			}
 			else
 			{
