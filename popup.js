@@ -58,7 +58,7 @@ HTMLBodyElement.prototype.pack = function(bookmarksMenu)
 	this.setHeight(height);
 };
 
-HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append)
+HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append, position)
 {
 	var len = childBookmarks.length;
 	if(len > 0)
@@ -70,14 +70,21 @@ HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append)
 		for(var i = 0; i < len; i++)
 		{
 			var bookmark = new Bookmark(childBookmarks[i]);
-			if(!append || this.isRoot)
+			if(!append)
 			{
 				this.appendChild(bookmark);
 			}
 			else
 			{
-				var openAll = this.lastChild;
-				this.insertBefore(bookmark, openAll.isOpenAll ? openAll.previousSibling : null);
+				if(position != -1)
+				{
+					this.insertBefore(bookmark, this.childNodes[position]);
+				}
+				else
+				{
+					var openAll = this.lastChild;
+					this.insertBefore(bookmark, openAll.isOpenAll ? openAll.previousSibling : null);
+				}
 			}
 			if(this.isRoot)
 			{
@@ -93,6 +100,10 @@ HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append)
 				}
 				bookmark.parentFolder = bookmark.rootFolder = this;
 				bookmark.parentFolderId = childBookmarks[i].parentId;
+				if(append && bookmark.isFolder)
+				{
+					bookmark.fillFolder();
+				}
 			}
 			else
 			{
@@ -429,12 +440,34 @@ HTMLLIElement.prototype.copy = function()
 
 HTMLLIElement.prototype.paste = function()
 {
-	var id = this.parentFolder.isRoot ? this.parentFolderId : this.parentFolder.id;
+	var isParentRoot = this.parentFolder.isRoot;
+	var id = isParentRoot ? this.parentFolderId : this.parentFolder.id;
 	chrome.experimental.bookmarkManager.paste(id);
 	var thiz = this;
 	chrome.bookmarks.getChildren(id, function(childs)
 	{
-		thiz.parentElement.fillFolderContent([childs[childs.length - 1]], true);
+		if(isParentRoot)
+		{
+			var myIdx = 0;
+			var sepIdx = 0;
+			var childNodes = thiz.parentFolder.childNodes;
+			for(var idx = 0, len = childNodes.length; idx < len; idx++)
+			{
+				if(childNodes[idx].id == thiz.id)
+				{
+					myIdx = idx;
+				}
+				else if(childNodes[idx].isSeparator)
+				{
+					sepIdx = idx;
+				}
+			}
+			thiz.parentElement.fillFolderContent([childs[childs.length - 1]], true, myIdx < sepIdx ? sepIdx : -1);
+		}
+		else
+		{
+			thiz.parentElement.fillFolderContent([childs[childs.length - 1]], true);
+		}
 		thiz.reDraw();
 	});
 }
