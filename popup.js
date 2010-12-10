@@ -76,7 +76,8 @@ HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append)
 			}
 			else
 			{
-				this.insertBefore(bookmark, this.lastChild.getAttribute('type') == 'openAllInTabs' ? this.lastChild.previousSibling : null);
+				this.insertBefore(bookmark,
+					this.lastChild.getAttribute('type') == 'openAllInTabs' ? this.lastChild.previousSibling : null);
 			}
 			if(this.isRoot)
 			{
@@ -431,22 +432,10 @@ HTMLLIElement.prototype.paste = function()
 	var id = this.parentFolder.isRoot ? this.parentFolderId : this.parentFolder.id;
 	chrome.experimental.bookmarkManager.paste(id);
 	var thiz = this;
-	chrome.bookmarks.getChildren(id, function(nodes)
+	chrome.bookmarks.getChildren(id, function(childs)
 	{
-		var currentIds = [];
-		thiz.parentElement.querySelectorAll('ul > li[type="bookmark"], ul > li[type="folder"]').forEach(function(n)
-		{
-			currentIds.push(parseInt(n.id));
-		});
-		for(var idx = nodes.length - 1; idx >= 0; idx--)
-		{
-			if(currentIds.indexOf(nodes[idx].id) == -1)
-			{
-				thiz.parentElement.fillFolderContent([nodes[idx]], true);
-				thiz.reDraw();
-				break;
-			}
-		}
+		thiz.parentElement.fillFolderContent([childs[childs.length - 1]], true);
+		thiz.reDraw();
 	});
 }
 
