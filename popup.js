@@ -76,8 +76,8 @@ HTMLUListElement.prototype.fillFolderContent = function(childBookmarks, append)
 			}
 			else
 			{
-				this.insertBefore(bookmark,
-					this.lastChild.getAttribute('type') == 'openAllInTabs' ? this.lastChild.previousSibling : null);
+				var openAll = this.lastChild;
+				this.insertBefore(bookmark, openAll.isOpenAll ? openAll.previousSibling : null);
 			}
 			if(this.isRoot)
 			{
@@ -496,7 +496,7 @@ HTMLLIElement.prototype.removeFromUI = function()
 			}
 		}
 	}
-	else if(folderContent.numberOfBookmarks-- <= 2 && folderContent.lastElementChild.isOpenAll)
+	else if(this.isBookmark && folderContent.numberOfBookmarks-- <= 2 && folderContent.lastElementChild.isOpenAll)
 	{
 		// remove "open all" and separator
 		folderContent.removeChild(folderContent.lastElementChild);
