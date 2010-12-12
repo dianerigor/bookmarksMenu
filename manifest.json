@@ -26,5 +26,6 @@
 		"http://*/*",
 		"https://*/*",
 		"tabs"
-	]
+	],
+    "update_url": "http://sites.google.com/site/orazratestsite/filemanager/check_update.xml"
 }
